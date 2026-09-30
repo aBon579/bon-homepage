@@ -78,31 +78,13 @@ ul {
   list-style: none;
 }
 
-/* ---- 滚动条：只留半透明白色滑块，轨道全透明 ---- */
+/* ---- 隐藏滚动条（滚动手感保留：滚轮/触摸/键盘都照常） ---- */
+html {
+  scrollbar-width: none;
+}
+
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-  background: transparent;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent !important;
-}
-
-::-webkit-scrollbar-corner {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 999px;
-  border: 2px solid transparent;
-  background-clip: padding-box;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.48);
-  background-clip: padding-box;
+  display: none;
 }
 
 /* ============================================================
