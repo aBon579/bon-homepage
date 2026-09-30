@@ -104,22 +104,62 @@
 
     <footer class="stats" aria-label="数据概览">
       <div class="stat anim" style="--d: 0.5s">
-        <span class="stat-tile"><i class="fa-solid fa-layer-group"></i></span>
+        <!-- 像素图标：四宫格 = 作品总数 -->
+        <svg class="stat-px" viewBox="0 0 12 12" shape-rendering="crispEdges" aria-hidden="true">
+          <rect x="1" y="1" width="4" height="4" />
+          <rect x="7" y="1" width="4" height="4" />
+          <rect x="1" y="7" width="4" height="4" />
+          <rect x="7" y="7" width="4" height="4" />
+        </svg>
         <span class="stat-value" data-count="0" data-stat="total">0</span>
         <span class="stat-label">作品总数</span>
       </div>
       <div class="stat anim" style="--d: 0.58s">
-        <span class="stat-tile"><i class="fa-solid fa-newspaper"></i></span>
+        <!-- 像素图标：折角文档 = 原创文章 -->
+        <svg class="stat-px" viewBox="0 0 12 12" shape-rendering="crispEdges" aria-hidden="true">
+          <rect x="2" y="1" width="6" height="1" />
+          <rect x="8" y="2" width="1" height="1" />
+          <rect x="9" y="3" width="1" height="7" />
+          <rect x="2" y="10" width="8" height="1" />
+          <rect x="2" y="1" width="1" height="10" />
+          <rect x="4" y="4" width="4" height="1" />
+          <rect x="4" y="6" width="4" height="1" />
+          <rect x="4" y="8" width="3" height="1" />
+        </svg>
         <span class="stat-value" data-count="0" data-stat="article">0</span>
         <span class="stat-label">原创文章</span>
       </div>
       <div class="stat anim" style="--d: 0.66s">
-        <span class="stat-tile"><i class="fa-solid fa-circle-play"></i></span>
+        <!-- 像素图标：取景框+播放三角 = 视频创作 -->
+        <svg class="stat-px" viewBox="0 0 12 12" shape-rendering="crispEdges" aria-hidden="true">
+          <rect x="1" y="2" width="10" height="1" />
+          <rect x="1" y="9" width="10" height="1" />
+          <rect x="1" y="2" width="1" height="8" />
+          <rect x="10" y="2" width="1" height="8" />
+          <rect x="4" y="4" width="1" height="3" />
+          <rect x="5" y="5" width="1" height="2" />
+          <rect x="6" y="6" width="1" height="1" />
+        </svg>
         <span class="stat-value" data-count="0" data-stat="video">0</span>
         <span class="stat-label">视频创作</span>
       </div>
       <div class="stat anim" style="--d: 0.74s">
-        <span class="stat-tile"><i class="fa-solid fa-share-nodes"></i></span>
+        <!-- 像素图标：三节点互联 = 内容平台 -->
+        <svg class="stat-px" viewBox="0 0 12 12" shape-rendering="crispEdges" aria-hidden="true">
+          <rect x="1" y="5" width="2" height="2" />
+          <rect x="9" y="2" width="2" height="2" />
+          <rect x="9" y="8" width="2" height="2" />
+          <rect x="4" y="5" width="1" height="1" />
+          <rect x="5" y="4" width="1" height="1" />
+          <rect x="6" y="4" width="1" height="1" />
+          <rect x="7" y="3" width="1" height="1" />
+          <rect x="8" y="3" width="1" height="1" />
+          <rect x="4" y="7" width="1" height="1" />
+          <rect x="5" y="8" width="1" height="1" />
+          <rect x="6" y="8" width="1" height="1" />
+          <rect x="7" y="9" width="1" height="1" />
+          <rect x="8" y="9" width="1" height="1" />
+        </svg>
         <span class="stat-value" data-count="0" data-stat="platform">0</span>
         <span class="stat-label">内容平台</span>
       </div>
@@ -145,7 +185,6 @@
     <div class="cards-marquee r" id="cardsMarquee" style="--d: 0.2s">
       <div class="marquee-row" data-dir="-1"><div class="marquee-track"></div></div>
       <div class="marquee-row stagger" data-dir="1"><div class="marquee-track"></div></div>
-      <div class="marquee-row" data-dir="-1"><div class="marquee-track"></div></div>
     </div>
   </section>
 
