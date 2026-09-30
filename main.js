@@ -349,7 +349,8 @@
       sphereCanvas.width = Math.round(W * dpr);
       sphereCanvas.height = Math.round(H * dpr);
       sctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      R = Math.min(W, H) * 0.3;
+      // 球体放大：半径≈面板短边 62%，上下被容器裁切，形成"星球地平线"构图
+      R = Math.min(W, H) * 0.62;
       cx = W / 2;
       cy = H / 2;
     }
@@ -415,7 +416,7 @@
       }
 
       // 远景星空（视差层）
-      const pOff = ry * 70;
+      const pOff = ry * 95;
       for (const f of farStars) {
         let sx = (f.fx * W + pOff * f.depth) % W;
         if (sx < 0) sx += W;
@@ -505,7 +506,7 @@
         const k = (q.z + 1) / 2;                    // 0远 1近
         const on = q.i === act;
         const breathe = reduced ? 0 : Math.sin(t * 1.6 + q.i) * 0.5 + 0.5;
-        const rad = (on ? 5.2 + breathe * 1.2 : 2.2 + 2.6 * k) * q.s;
+        const rad = (on ? 6 + breathe * 1.4 : 2.6 + 3.2 * k) * q.s;
 
         const g = sctx.createRadialGradient(q.x, q.y, 0, q.x, q.y, rad * 4.6);
         if (on) {
