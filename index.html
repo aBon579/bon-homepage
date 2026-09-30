@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Intelligence Designed To Evolve</title>
-  <meta name="description" content="Bon 的个人主页 —— 热衷于折腾电子产品、NAS 与音乐服务器。作品集、B站与公众号入口。" />
+  <meta name="description" content="阿Bon 的个人主页 —— AI、NAS、DIY 实测、教程与玩法。作品集、B站与公众号。" />
   <meta name="theme-color" content="#000000" />
 
   <!-- Inter (UI) -->
@@ -90,28 +90,13 @@
     </header>
 
     <section class="hero">
-      <div class="trust-row">
-        <div class="avatars">
-          <span class="avatar a1 anim" style="--d: 0.05s">
-            <span class="avatar-ring"><span class="avatar-inner"><i class="fa-solid fa-microchip"></i></span></span>
-          </span>
-          <span class="avatar a2 anim" style="--d: 0.1s">
-            <span class="avatar-ring"><span class="avatar-inner"><i class="fa-solid fa-music"></i></span></span>
-          </span>
-          <span class="avatar a3 anim" style="--d: 0.15s">
-            <span class="avatar-ring"><span class="avatar-inner"><i class="fa-solid fa-robot"></i></span></span>
-          </span>
-        </div>
-        <span class="trust-pill anim" style="--d: 0.2s">NAS · 音乐 · 智能家居 · AI 工具</span>
-      </div>
-
       <h1 class="headline">
         <span class="line line-1">Intelligence</span>
         <span class="line line-2">Designed To Evolve</span>
       </h1>
 
       <p class="hero-sub anim" style="--d: 0.28s">
-        你好，我是 Bon。热衷于折腾电子产品、NAS 与音乐服务器，也写代码、做视频。这里放着我做过的东西，和踩过的坑。
+        Hello.我系阿Bon；AI、NAS、DIY，都会在这里聊聊，实测，教程以及各种玩法，一边摸索，一边整理，和大家一起分享
       </p>
 
       <a class="cta anim" href="#works" style="--d: 0.4s">看看作品</a>
@@ -119,44 +104,48 @@
 
     <footer class="stats" aria-label="数据概览">
       <div class="stat anim" style="--d: 0.5s">
-        <span class="stat-icon">&lt;</span>
-        <span class="stat-value" data-count="24" data-decimals="0" data-suffix="">24</span>
-        <span class="stat-label">电子项目</span>
+        <span class="stat-tile"><i class="fa-solid fa-layer-group"></i></span>
+        <span class="stat-value" data-count="0" data-stat="total">0</span>
+        <span class="stat-label">作品总数</span>
       </div>
       <div class="stat anim" style="--d: 0.58s">
-        <span class="stat-icon">%</span>
-        <span class="stat-value" data-count="58" data-decimals="0" data-suffix="">58</span>
+        <span class="stat-tile"><i class="fa-solid fa-newspaper"></i></span>
+        <span class="stat-value" data-count="0" data-stat="article">0</span>
         <span class="stat-label">原创文章</span>
       </div>
       <div class="stat anim" style="--d: 0.66s">
-        <span class="stat-icon">*</span>
-        <span class="stat-value" data-count="17" data-decimals="0" data-suffix="">17</span>
-        <span class="stat-label">实用教程</span>
+        <span class="stat-tile"><i class="fa-solid fa-circle-play"></i></span>
+        <span class="stat-value" data-count="0" data-stat="video">0</span>
+        <span class="stat-label">视频创作</span>
       </div>
       <div class="stat anim" style="--d: 0.74s">
-        <span class="stat-icon">#</span>
-        <span class="stat-value" data-count="2" data-decimals="0" data-suffix="">2</span>
+        <span class="stat-tile"><i class="fa-solid fa-share-nodes"></i></span>
+        <span class="stat-value" data-count="0" data-stat="platform">0</span>
         <span class="stat-label">内容平台</span>
       </div>
     </footer>
   </main>
 
-  <!-- ============ works: list + nebula ============ -->
+  <!-- ============ works: sphere star map + card marquee ============ -->
   <section class="works" id="works">
     <header class="section-head r" id="about" style="--d: 0s">
       <span class="eyebrow">WORKS</span>
       <h2>我的作品集</h2>
-      <p>从 NAS 到智能家居，从音乐刮削到 AI 工具——左边挑一个，右边的星图会点亮它。</p>
+      <p>
+        星图自动旋转，转到最前面的星星会点亮下方对应的卡片；按住拖动星图，可以自己找目标。卡片分三行交错滚动，悬停暂停，点击直达原文。
+      </p>
     </header>
 
-    <div class="works-grid">
-      <!-- 作品列表由 main.js 从 works-data.js 渲染，数据改动只动数据文件 -->
-      <ul class="works-list" id="worksList" aria-label="作品列表"></ul>
+    <div class="sphere-wrap r" style="--d: 0.1s">
+      <canvas id="sphere"></canvas>
+      <div class="sphere-hint"><i class="fa-solid fa-hand-pointer"></i> 拖动旋转 · 最前方的星星 = 高亮卡片</div>
+    </div>
 
-      <div class="nebula-wrap r" style="--d: 0.15s">
-        <canvas id="nebula" aria-hidden="true"></canvas>
-        <div class="nebula-tip" id="nebulaTip" hidden></div>
-      </div>
+    <!-- 三行卡片由 main.js 从 works-data.js 渲染进 marquee -->
+    <div class="cards-marquee r" id="cardsMarquee" style="--d: 0.2s">
+      <div class="marquee-row" data-dir="-1"><div class="marquee-track"></div></div>
+      <div class="marquee-row stagger" data-dir="1"><div class="marquee-track"></div></div>
+      <div class="marquee-row" data-dir="-1"><div class="marquee-track"></div></div>
     </div>
   </section>
 
@@ -198,7 +187,7 @@
   </section>
 
   <footer class="site-footer">
-    <span>© 2026 Bon · 用蓝色做的</span>
+    <span>© 2026 Bon · By DeepSeek Harness</span>
     <span class="sf-links">作品集 · B站 · 公众号</span>
   </footer>
 
