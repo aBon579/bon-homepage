@@ -78,18 +78,18 @@ ul {
   list-style: none;
 }
 
-/* ---- 滚动条：只留半透明磨砂白条（滑块），无轨道 ---- */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.34) transparent;
-}
-
+/* ---- 滚动条：只留半透明白色滑块，轨道全透明 ---- */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+::-webkit-scrollbar-corner {
   background: transparent;
 }
 
