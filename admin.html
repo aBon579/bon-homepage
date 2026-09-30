@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Bon 作品集 · 本地编辑器</title>
+<style>
+  :root {
+    --blue-1: #4338ca;
+    --blue-2: #1d4ed8;
+    --blue-soft: #7a8fff;
+    --glass: rgba(255, 255, 255, 0.06);
+    --glass-border: rgba(255, 255, 255, 0.14);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    background:
+      radial-gradient(90% 70% at 15% 0%, rgba(67, 56, 202, 0.35), transparent 55%),
+      radial-gradient(80% 60% at 90% 100%, rgba(29, 78, 216, 0.25), transparent 55%),
+      #04040c;
+    color: #fff;
+    font-family: "Inter", "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+    padding: clamp(20px, 4vw, 48px);
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; }
+  h1 { font-size: clamp(22px, 3vw, 30px); letter-spacing: -0.02em; }
+  h1 span { color: var(--blue-soft); }
+  .note {
+    margin-top: 10px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 13px;
+    line-height: 1.7;
+  }
+  .note b { color: #fff; }
+  .draft-bar {
+    margin-top: 12px;
+    display: none;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 12px 16px;
+    border-radius: 14px;
+    background: rgba(67, 56, 202, 0.25);
+    border: 1px solid rgba(122, 143, 255, 0.4);
+    font-size: 13px;
+  }
+  .draft-bar.show { display: flex; }
+  .grid {
+    margin-top: 22px;
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+  @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+  .panel {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: 22px;
+    padding: 20px;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+  .panel h2 { font-size: 15px; font-weight: 600; margin-bottom: 14px; color: rgba(255,255,255,0.85); }
+  .item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 12px;
+    border-radius: 14px;
+    border: 1px solid transparent;
+    transition: background 0.2s ease;
+  }
+  .item:hover { background: rgba(255, 255, 255, 0.05); }
+  .item.editing { background: rgba(67, 56, 202, 0.22); border-color: rgba(122, 143, 255, 0.4); }
+  .item .num { font-family: Consolas, monospace; color: var(--blue-soft); font-size: 13px; width: 22px; flex: 0 0 auto; }
+  .item .meta { flex: 1 1 auto; min-width: 0; }
+  .item .meta .t { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .item .meta .s { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .badge {
+    flex: 0 0 auto;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    border: 1px solid rgba(122, 143, 255, 0.35);
+    color: #a9b8ff;
+  }
+  .badge.video { border-color: rgba(110, 200, 255, 0.35); color: #8cd6ff; }
+  .badge.nolink { border-color: rgba(255, 255, 255, 0.2); color: rgba(255,255,255,0.45); }
+  .ops { flex: 0 0 auto; display: flex; gap: 4px; }
+  .ops button {
+    border: 1px solid rgba(255,255,255,0.14);
+    background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.8);
+    border-radius: 8px;
+    font-size: 12px;
+    padding: 4px 8px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  .ops button:hover { background: rgba(255,255,255,0.14); }
+  .ops button.del:hover { background: rgba(220, 60, 60, 0.35); }
+  .empty { color: rgba(255,255,255,0.45); font-size: 13px; padding: 10px 4px; }
+  label { display: block; font-size: 12.5px; color: rgba(255,255,255,0.6); margin: 12px 0 6px; }
+  label .cnt { color: var(--blue-soft); }
+  input[type="text"], input[type="url"], textarea {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 12px;
+    color: #fff;
+    font: inherit;
+    font-size: 14px;
+    padding: 10px 12px;
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+  input:focus, textarea:focus { border-color: rgba(122, 143, 255, 0.65); }
+  textarea { resize: vertical; min-height: 64px; }
+  .radios { display: flex; gap: 10px; }
+  .radios label {
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+    color: rgba(255,255,255,0.8);
+    font-size: 13px;
+  }
+  .radios input { accent-color: var(--blue-2); }
+  .chips { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: rgba(122, 143, 255, 0.16);
+    border: 1px solid rgba(122, 143, 255, 0.3);
+    color: #c3cdff;
+  }
+  .btns { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 10px; }
+  button.btn {
+    border: 0;
+    border-radius: 999px;
+    font: inherit;
+    font-size: 13.5px;
+    font-weight: 600;
+    padding: 10px 18px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  }
+  button.btn:hover { transform: translateY(-1px); }
+  .btn.primary { background: linear-gradient(135deg, var(--blue-1), var(--blue-2)); color: #fff; box-shadow: 0 8px 22px rgba(67, 56, 202, 0.4); }
+  .btn.ghost { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.85); border: 1px solid rgba(255,255,255,0.16); }
+  .hint { margin-top: 10px; font-size: 12px; color: rgba(255,255,255,0.45); line-height: 1.6; }
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: 30px;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(10, 12, 28, 0.92);
+    border: 1px solid rgba(122, 143, 255, 0.45);
+    color: #fff;
+    font-size: 13px;
+    padding: 10px 18px;
+    border-radius: 999px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    z-index: 50;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Bon 作品集 <span>· 本地编辑器</span></h1>
+  <div class="note">
+    用法：加/改条目 → 点<b>「下载 works-data.js」</b> → 用下载的文件<b>覆盖项目根目录的 works-data.js</b> → 重新部署，主页刷新生效。<br />
+    安全说明：公开主页没有任何添加入口；这个页面只是你本地的生成工具，它改不了线上任何东西——别人就算打开它，不上传文件也无济于事。
+  </div>
+  <div class="draft-bar" id="draftBar">
+    <span>检测到未导出的本地草稿，已为你恢复。</span>
+    <button class="btn ghost" id="dropDraft" style="padding:6px 12px;font-size:12.5px;">丢弃草稿，重新载入数据文件</button>
+  </div>
+
+  <div class="grid">
+    <div class="panel">
+      <h2>作品列表（拖不动就用 上移/下移）</h2>
+      <div id="list"></div>
+      <div class="btns">
+        <button class="btn ghost" id="btnNew">＋ 新增条目</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2 id="formTitle">新增条目</h2>
+      <label>标题 <span class="cnt" id="titleCnt">0/30</span>（必填，最多 30 字）</label>
+      <input type="text" id="fTitle" maxlength="30" placeholder="例：飞牛音乐 TV 端" />
+      <label>链接（公众号文章 / B站视频，填了卡片才能点）</label>
+      <input type="url" id="fLink" placeholder="https://mp.weixin.qq.com/s/... 或 https://space.bilibili.com/video/..." />
+      <label>简介（一句话）</label>
+      <textarea id="fDesc" maxlength="60" placeholder="这句话会显示在作品卡片上"></textarea>
+      <label>关键词（最多 5 个，用逗号或空格分开）</label>
+      <input type="text" id="fKeywords" placeholder="NAS, 音乐, TV" />
+      <div class="chips" id="kwChips"></div>
+      <label>作品类别</label>
+      <div class="radios">
+        <label><input type="radio" name="cat" value="文章" checked /> 文章</label>
+        <label><input type="radio" name="cat" value="视频" /> 视频</label>
+      </div>
+      <div class="btns">
+        <button class="btn primary" id="btnSave">保存条目</button>
+        <button class="btn ghost" id="btnCancel">取消</button>
+      </div>
+      <div class="hint">保存只写到浏览器本地草稿，点「下载 works-data.js」并覆盖文件后才会影响主页。</div>
+    </div>
+  </div>
+
+  <div class="btns" style="margin-top:20px;">
+    <button class="btn primary" id="btnDownload">下载 works-data.js</button>
+    <button class="btn ghost" id="btnCopy">复制代码到剪贴板</button>
+  </div>
+  <div class="hint">
+    字段规则：title ≤30 字；link 必须 http(s) 开头；keywords ≤5；category 只能是 文章/视频。<br />
+    草稿自动存在浏览器 localStorage，关页面不丢；换电脑请记得先导出文件。
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="works-data.js"></script>
+<script>
+(function () {
+  "use strict";
+  var DRAFT_KEY = "bon-works-draft-v1";
+  var CATS = ["文章", "视频"];
+  var $ = function (s) { return document.querySelector(s); };
+  var state = [];
+  var editing = -1; // -1 = 新增
+
+  function clone(v) { return JSON.parse(JSON.stringify(v)); }
+
+  function toast(msg) {
+    var t = $("#toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(t._timer);
+    t._timer = setTimeout(function () { t.classList.remove("show"); }, 2200);
+  }
+
+  function saveDraft() {
+    try { localStorage.setItem(DRAFT_KEY, JSON.stringify(state)); } catch (e) {}
+  }
+
+  function keywordsOf(text) {
+    return text.split(/[,，、\s]+/).map(function (k) { return k.trim(); }).filter(Boolean).slice(0, 5);
+  }
+
+  function renderChips() {
+    var kws = keywordsOf($("#fKeywords").value);
+    var box = $("#kwChips");
+    box.innerHTML = "";
+    kws.forEach(function (k) {
+      var s = document.createElement("span");
+      s.className = "chip";
+      s.textContent = k;
+      box.appendChild(s);
+    });
+  }
+
+  function renderList() {
+    var box = $("#list");
+    box.innerHTML = "";
+    if (!state.length) {
+      var d = document.createElement("div");
+      d.className = "empty";
+      d.textContent = "还没有作品，点「新增条目」加第一条。";
+      box.appendChild(d);
+      return;
+    }
+    state.forEach(function (w, i) {
+      var row = document.createElement("div");
+      row.className = "item" + (i === editing ? " editing" : "");
+
+      var num = document.createElement("span");
+      num.className = "num";
+      num.textContent = String(i + 1).padStart(2, "0");
+
+      var badge = document.createElement("span");
+      badge.className = "badge" + (w.category === "视频" ? " video" : "");
+      badge.textContent = w.category;
+
+      var meta = document.createElement("div");
+      meta.className = "meta";
+      var t = document.createElement("div");
+      t.className = "t";
+      t.textContent = w.title;
+      var s = document.createElement("div");
+      s.className = "s";
+      s.textContent = (w.link ? w.link : "未填链接") + (w.keywords.length ? "  ·  " + w.keywords.join(" / ") : "");
+      meta.appendChild(t);
+      meta.appendChild(s);
+
+      var ops = document.createElement("div");
+      ops.className = "ops";
+      function mkBtn(txt, cls, fn) {
+        var b = document.createElement("button");
+        b.textContent = txt;
+        if (cls) b.className = cls;
+        b.addEventListener("click", fn);
+        return b;
+      }
+      ops.appendChild(mkBtn("编辑", "", function () { startEdit(i); }));
+      ops.appendChild(mkBtn("↑", "", function () { move(i, -1); }));
+      ops.appendChild(mkBtn("↓", "", function () { move(i, 1); }));
+      ops.appendChild(mkBtn("删", "del", function () { removeAt(i); }));
+
+      row.appendChild(num);
+      row.appendChild(badge);
+      row.appendChild(meta);
+      row.appendChild(ops);
+      box.appendChild(row);
+    });
+  }
+
+  function startEdit(i) {
+    editing = i;
+    var w = state[i];
+    $("#formTitle").textContent = "编辑：" + w.title;
+    $("#fTitle").value = w.title;
+    $("#fLink").value = w.link;
+    $("#fDesc").value = w.desc;
+    $("#fKeywords").value = w.keywords.join(", ");
+    document.querySelector('input[name="cat"][value="' + w.category + '"]').checked = true;
+    updateCnt();
+    renderChips();
+    renderList();
+  }
+
+  function resetForm() {
+    editing = -1;
+    $("#formTitle").textContent = "新增条目";
+    $("#fTitle").value = "";
+    $("#fLink").value = "";
+    $("#fDesc").value = "";
+    $("#fKeywords").value = "";
+    document.querySelector('input[name="cat"][value="文章"]').checked = true;
+    updateCnt();
+    renderChips();
+    renderList();
+  }
+
+  function move(i, dir) {
+    var j = i + dir;
+    if (j < 0 || j >= state.length) return;
+    var tmp = state[i];
+    state[i] = state[j];
+    state[j] = tmp;
+    if (editing === i) editing = j;
+    else if (editing === j) editing = i;
+    saveDraft();
+    renderList();
+  }
+
+  function removeAt(i) {
+    if (!confirm("删除「" + state[i].title + "」？")) return;
+    state.splice(i, 1);
+    if (editing === i) resetForm();
+    else {
+      if (editing > i) editing--;
+      saveDraft();
+      renderList();
+    }
+    saveDraft();
+  }
+
+  function updateCnt() {
+    var len = $("#fTitle").value.trim().length;
+    var el = $("#titleCnt");
+    el.textContent = len + "/30";
+    el.style.color = len > 30 ? "#ff7b7b" : "";
+  }
+
+  $("#fTitle").addEventListener("input", updateCnt);
+  $("#fKeywords").addEventListener("input", renderChips);
+
+  $("#btnNew").addEventListener("click", function () {
+    resetForm();
+    $("#fTitle").focus();
+  });
+
+  $("#btnCancel").addEventListener("click", resetForm);
+
+  $("#btnSave").addEventListener("click", function () {
+    var title = $("#fTitle").value.trim();
+    var link = $("#fLink").value.trim();
+    var desc = $("#fDesc").value.trim();
+    var kws = keywordsOf($("#fKeywords").value);
+    var cat = document.querySelector('input[name="cat"]:checked').value;
+
+    if (!title) { toast("标题必填"); $("#fTitle").focus(); return; }
+    if (title.length > 30) { toast("标题最多 30 字"); return; }
+    if (link && !/^https?:\/\/.+/i.test(link)) { toast("链接要以 http(s):// 开头"); $("#fLink").focus(); return; }
+    if (CATS.indexOf(cat) < 0) { toast("类别只能是 文章 或 视频"); return; }
+
+    var entry = { title: title, link: link, desc: desc, keywords: kws, category: cat };
+    if (editing >= 0) state[editing] = entry;
+    else state.push(entry);
+    saveDraft();
+    resetForm();
+    toast(editing >= 0 ? "已更新（记得下载文件）" : "已添加（记得下载文件）");
+  });
+
+  function buildFile() {
+    var header = [
+      "/* ============================================================",
+      " * works-data.js —— 作品集数据（由 admin.html 导出或手改）",
+      " * title≤30字 | link 链接 | desc 简介 | keywords ≤5 | category: 文章/视频",
+      " * ============================================================ */",
+      "window.WORKS = " + JSON.stringify(state, null, 2) + ";",
+      ""
+    ].join("\n");
+    return header;
+  }
+
+  $("#btnDownload").addEventListener("click", function () {
+    var blob = new Blob([buildFile()], { type: "text/javascript;charset=utf-8" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "works-data.js";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+    toast("已下载，去覆盖项目里的 works-data.js");
+  });
+
+  $("#btnCopy").addEventListener("click", function () {
+    var text = buildFile();
+    function fallback() {
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand("copy"); toast("已复制"); }
+      catch (e) { toast("复制失败，请手动下载文件"); }
+      document.body.removeChild(ta);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { toast("已复制"); }, fallback);
+    } else fallback();
+  });
+
+  $("#dropDraft").addEventListener("click", function () {
+    try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
+    location.reload();
+  });
+
+  // 初始化：优先恢复草稿
+  var initial = Array.isArray(window.WORKS) ? clone(window.WORKS) : [];
+  var draft = null;
+  try { draft = JSON.parse(localStorage.getItem(DRAFT_KEY) || "null"); } catch (e) {}
+  if (Array.isArray(draft) && JSON.stringify(draft) !== JSON.stringify(initial)) {
+    state = draft;
+    $("#draftBar").classList.add("show");
+  } else {
+    state = initial;
+  }
+  resetForm();
+})();
+</script>
+</body>
+</html>
