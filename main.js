@@ -292,6 +292,42 @@
       });
     }
 
+    // --- 星云云雾（背景层，缓慢漂移+呼吸） ---
+    const clouds = [
+      { x: 0.28, y: 0.3, r: 0.52, hue: [67, 56, 202], phase: 0.0, spd: 0.05, a: 0.17 },
+      { x: 0.72, y: 0.66, r: 0.58, hue: [29, 78, 216], phase: 2.1, spd: 0.04, a: 0.15 },
+      { x: 0.52, y: 0.2, r: 0.42, hue: [110, 72, 200], phase: 4.2, spd: 0.06, a: 0.11 },
+    ];
+
+    // --- 远景星空（拖动球体时反向慢移，制造视差） ---
+    const farStars = [];
+    for (let i = 0; i < 90; i++) {
+      farStars.push({
+        fx: Math.random(),
+        fy: Math.random(),
+        big: Math.random() > 0.82,
+        depth: 0.15 + Math.random() * 0.35,
+        phase: Math.random() * Math.PI * 2,
+      });
+    }
+
+    // --- 轨道环 + 像素小卫星 ---
+    const orbits = [
+      { tiltX: 1.15, tiltZ: 0.35, rad: 1.26, a: 0.16, period: 16 },
+      { tiltX: 1.9, tiltZ: -0.5, rad: 1.52, a: 0.09, period: 27 },
+    ];
+
+    function orbitPoint(o, th) {
+      const x = Math.cos(th) * o.rad;
+      const z = Math.sin(th) * o.rad;
+      const x1 = x * Math.cos(o.tiltZ);
+      const y1 = x * Math.sin(o.tiltZ);
+      const y2 = y1 * Math.cos(o.tiltX) - z * Math.sin(o.tiltX);
+      const z2 = y1 * Math.sin(o.tiltX) + z * Math.cos(o.tiltX);
+      const s = FOCAL / (CAM - z2);
+      return { x: cx + x1 * R * s, y: cy + y2 * R * s, z: z2, s };
+    }
+
     let W = 0, H = 0, dpr = 1, R = 100, cx = 0, cy = 0;
     let ry = 0.6, rx = -0.28;        // 旋转角（Y 自转 + X 俯仰）
     let vy = 0, vx = 0;              // 惯性速度
@@ -318,17 +354,22 @@
       cy = H / 2;
     }
 
+    let cosX = 1, sinX = 0, cosY = 1, sinY = 0;
+    function updateRot() {
+      cosX = Math.cos(rx); sinX = Math.sin(rx);
+      cosY = Math.cos(ry); sinY = Math.sin(ry);
+    }
+    function projPoint(p) {
+      const y1 = p.y * cosX - p.z * sinX;
+      const z1 = p.y * sinX + p.z * cosX;
+      const x2 = p.x * cosY + z1 * sinY;
+      const z2 = -p.x * sinY + z1 * cosY;
+      const s = FOCAL / (CAM - z2);
+      return { x: cx + x2 * R * s, y: cy + y1 * R * s, z: z2, s };
+    }
     function project() {
-      const cosX = Math.cos(rx), sinX = Math.sin(rx);
-      const cosY = Math.cos(ry), sinY = Math.sin(ry);
-      lastProj = pts.map((p, i) => {
-        const y1 = p.y * cosX - p.z * sinX;
-        const z1 = p.y * sinX + p.z * cosX;
-        const x2 = p.x * cosY + z1 * sinY;
-        const z2 = -p.x * sinY + z1 * cosY;
-        const s = FOCAL / (CAM - z2);
-        return { x: cx + x2 * R * s, y: cy + y1 * R * s, z: z2, s, i };
-      });
+      updateRot();
+      lastProj = pts.map((p, i) => Object.assign(projPoint(p), { i }));
     }
 
     function draw(now) {
@@ -355,6 +396,45 @@
       sphereFront = front;
 
       sctx.clearRect(0, 0, W, H);
+      const silR = (R * FOCAL) / Math.sqrt(CAM * CAM - 1); // 球剪影屏幕半径
+
+      // 星云云雾
+      for (const c of clouds) {
+        const dx = reduced ? 0 : Math.sin(t * c.spd + c.phase) * 0.06;
+        const dy = reduced ? 0 : Math.cos(t * c.spd * 0.8 + c.phase) * 0.05;
+        const px = (c.x + dx) * W;
+        const py = (c.y + dy) * H;
+        const pr = c.r * Math.min(W, H) * (reduced ? 1 : 1 + 0.04 * Math.sin(t * 0.3 + c.phase));
+        const g = sctx.createRadialGradient(px, py, 0, px, py, pr);
+        g.addColorStop(0, "rgba(" + c.hue.join(",") + "," + c.a + ")");
+        g.addColorStop(1, "rgba(" + c.hue.join(",") + ",0)");
+        sctx.fillStyle = g;
+        sctx.beginPath();
+        sctx.arc(px, py, pr, 0, Math.PI * 2);
+        sctx.fill();
+      }
+
+      // 远景星空（视差层）
+      const pOff = ry * 70;
+      for (const f of farStars) {
+        let sx = (f.fx * W + pOff * f.depth) % W;
+        if (sx < 0) sx += W;
+        const tw = reduced ? 0.5 : 0.5 + 0.5 * Math.sin(t * (0.4 + f.depth) * 4 + f.phase);
+        sctx.fillStyle = "rgba(190, 205, 255, " + (0.12 + 0.24 * tw) + ")";
+        const sz = f.big ? 2 : 1;
+        sctx.fillRect(Math.round(sx), Math.round(f.fy * H), sz, sz);
+      }
+
+      // 大气边缘辉光
+      const rimB = reduced ? 0.5 : 0.5 + 0.5 * Math.sin(t * 0.8);
+      const rim = sctx.createRadialGradient(cx, cy, silR * 0.8, cx, cy, silR * 1.2);
+      rim.addColorStop(0, "rgba(90, 120, 255, 0)");
+      rim.addColorStop(0.5, "rgba(110, 140, 255, " + (0.09 + 0.05 * rimB) + ")");
+      rim.addColorStop(1, "rgba(90, 120, 255, 0)");
+      sctx.fillStyle = rim;
+      sctx.beginPath();
+      sctx.arc(cx, cy, silR * 1.2, 0, Math.PI * 2);
+      sctx.fill();
 
       // 尘埃
       for (const p of dust) {
@@ -363,6 +443,46 @@
         sctx.fillStyle = "rgba(180, 196, 255, " + a + ")";
         sctx.arc(p.x * W, p.y * H, p.r, 0, Math.PI * 2);
         sctx.fill();
+      }
+
+      // 经纬骨架（背面弧线被球体遮挡）
+      const onSphere = (q) => !(q.z < 0 && (q.x - cx) ** 2 + (q.y - cy) ** 2 < silR * silR * 0.97);
+      for (let m = 0; m < 8; m++) {
+        const phi = (m * Math.PI) / 4;
+        sctx.beginPath();
+        let pen = false;
+        for (let k = 0; k <= 36; k++) {
+          const th = (k / 36) * Math.PI;
+          const q = projPoint({
+            x: Math.sin(th) * Math.cos(phi),
+            y: Math.cos(th),
+            z: Math.sin(th) * Math.sin(phi),
+          });
+          if (onSphere(q)) {
+            if (!pen) { sctx.moveTo(q.x, q.y); pen = true; }
+            else sctx.lineTo(q.x, q.y);
+          } else pen = false;
+        }
+        sctx.strokeStyle = "rgba(122, 143, 255, 0.08)";
+        sctx.lineWidth = 1;
+        sctx.stroke();
+      }
+      const latSet = [[0, 0.12], [0.5, 0.09], [-0.5, 0.09], [0.85, 0.07], [-0.85, 0.07]];
+      for (const [ly, la] of latSet) {
+        const lr = Math.sqrt(Math.max(0, 1 - ly * ly));
+        sctx.beginPath();
+        let pen = false;
+        for (let k = 0; k <= 48; k++) {
+          const th = (k / 48) * Math.PI * 2;
+          const q = projPoint({ x: Math.cos(th) * lr, y: ly, z: Math.sin(th) * lr });
+          if (onSphere(q)) {
+            if (!pen) { sctx.moveTo(q.x, q.y); pen = true; }
+            else sctx.lineTo(q.x, q.y);
+          } else pen = false;
+        }
+        sctx.strokeStyle = "rgba(122, 143, 255, " + la + ")";
+        sctx.lineWidth = 1;
+        sctx.stroke();
       }
 
       // 连线（按 z 排序后画，近处更亮）
@@ -412,6 +532,56 @@
           sctx.fillStyle = "rgba(255, 255, 255, 0.92)";
           sctx.textAlign = "center";
           sctx.fillText(works[q.i].title, q.x, q.y + rad + 18);
+        }
+      }
+
+      // 轨道环 + 像素小卫星（球体前方的弧段压在星点之上，背面被遮挡）
+      for (const o of orbits) {
+        sctx.beginPath();
+        let pen = false;
+        for (let k = 0; k <= 72; k++) {
+          const q = orbitPoint(o, (k / 72) * Math.PI * 2);
+          const hidden = q.z < 0 && (q.x - cx) ** 2 + (q.y - cy) ** 2 < silR * silR;
+          if (hidden) { pen = false; continue; }
+          if (!pen) { sctx.moveTo(q.x, q.y); pen = true; }
+          else sctx.lineTo(q.x, q.y);
+        }
+        sctx.strokeStyle = "rgba(130, 160, 255, " + o.a + ")";
+        sctx.lineWidth = 1;
+        sctx.stroke();
+
+        const th = reduced ? 1.2 : (t / o.period) * Math.PI * 2;
+        const sq = orbitPoint(o, th);
+        const occluded = sq.z < 0 && (sq.x - cx) ** 2 + (sq.y - cy) ** 2 < silR * silR;
+        if (!occluded) {
+          const sg = sctx.createRadialGradient(sq.x, sq.y, 0, sq.x, sq.y, 7 * sq.s);
+          sg.addColorStop(0, "rgba(195, 212, 255, 0.85)");
+          sg.addColorStop(1, "rgba(120, 150, 255, 0)");
+          sctx.fillStyle = sg;
+          sctx.beginPath();
+          sctx.arc(sq.x, sq.y, 7 * sq.s, 0, Math.PI * 2);
+          sctx.fill();
+          sctx.fillStyle = "#fff";
+          sctx.fillRect(Math.round(sq.x) - 1, Math.round(sq.y) - 1, 3, 3);
+        }
+      }
+
+      // 前置星像素瞄准框（跟随当前高亮的星）
+      const fq = lastProj[act];
+      if (fq) {
+        const br = reduced ? 0 : Math.sin(t * 2.4) * 1.5;
+        const gap = Math.round(10 + br);
+        const arm = 6;
+        const ax = Math.round(fq.x);
+        const ay = Math.round(fq.y);
+        sctx.fillStyle = "rgba(140, 168, 255, 0.9)";
+        for (const [skx, sky] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) {
+          const bx = ax + skx * gap;
+          const by = ay + sky * gap;
+          // 横臂
+          sctx.fillRect(skx < 0 ? bx - arm + 1 : bx - 1, sky < 0 ? by - 1 : by - 1, arm + 1, 2);
+          // 竖臂
+          sctx.fillRect(skx < 0 ? bx - 1 : bx - 1, sky < 0 ? by - arm + 1 : by - 1, 2, arm + 1);
         }
       }
 
