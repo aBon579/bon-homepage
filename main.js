@@ -477,17 +477,17 @@
     sphereCanvas.addEventListener("pointerup", endDrag);
     sphereCanvas.addEventListener("pointercancel", endDrag);
 
-    // --- 点击星星 → 高亮对应卡片 ---
+    // --- 点击星星 → 高亮对应卡片并直接打开链接 ---
     sphereCanvas.addEventListener("click", (e) => {
       if (moved > 6) return; // 拖拽过，不算点击
       const rect = sphereCanvas.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
-      let best = -1, bestD = 26 * 26, bestZ = -Infinity;
+      // 命中半径内取最靠前（z 最大）的那颗星
+      let best = -1, bestZ = -Infinity;
       for (const q of lastProj) {
         const d = (q.x - x) ** 2 + (q.y - y) ** 2;
-        if (d < bestD && q.z > bestZ) {
-          bestD = d;
+        if (d < 26 * 26 && q.z > bestZ) {
           bestZ = q.z;
           best = q.i;
         }
@@ -495,6 +495,8 @@
       if (best >= 0) {
         syncActive(best);
         pulseCard(best);
+        const w = works[best];
+        if (w && w.link) window.open(w.link, "_blank", "noopener");
       }
     });
 
@@ -692,7 +694,10 @@
           }
         });
         track.addEventListener("click", (e) => {
-          const card = e.target.closest(".work-card");
+          // setPointerCapture 会把 click 的 target 改写成 track 本身，
+          // e.target 不可信——用坐标反查真实卡片
+          const hit = document.elementFromPoint(e.clientX, e.clientY);
+          const card = hit && hit.closest(".work-card");
           if (!card || st.moved > 6) return;
           const idx = Number(card.dataset.index);
           const w = works[idx];
