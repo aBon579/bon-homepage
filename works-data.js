@@ -275,5 +275,15 @@ window.WORKS = [
       "HomePod"
     ],
     "category": "文章"
+  },
+  {
+    "title": "NAS + 老旧音箱 = “HomePod”？",
+    "link": "https://t.bilibili.com/1254202897960271874?share_source=pc_native",
+    "desc": "一个项目让你吃灰的旧音箱变成HomePod",
+    "keywords": [
+      "NAS",
+      "HomePod"
+    ],
+    "category": "视频"
   }
 ];
