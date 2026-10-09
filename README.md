@@ -18,7 +18,7 @@
 
 1. 浏览器打开 `admin.html` → 填表（标题≤30字 / 链接 / 简介 / 关键词≤5 / 类别文章或视频）
 2. 点「下载 works-data.js」，覆盖本目录同名文件
-3. 双击「双击部署.bat」（或运行 `powershell -ExecutionPolicy Bypass -File .\deploy.ps1`），一两分钟后线上生效
+3. 运行 `powershell -ExecutionPolicy Bypass -File .\deploy.ps1`，一两分钟后线上生效
 
 不想用 admin 就直接手改 `works-data.js`，格式看文件内注释。
 
@@ -39,7 +39,7 @@ python -m http.server 8931
 2. 在本文件夹执行：
    ```
    git remote add origin https://github.com/<你的用户名>/bon-homepage.git
-   .\deploy.ps1
+   powershell -ExecutionPolicy Bypass -File .\deploy.ps1
    ```
    首次 push 会弹浏览器登录授权，装一次即可。
 3. 仓库 Settings → Pages → Source 选 **Deploy from branch**，Branch 选 `main` / `(root)`，保存

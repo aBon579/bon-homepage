@@ -285,5 +285,25 @@ window.WORKS = [
       "HomePod"
     ],
     "category": "视频"
+  },
+  {
+    "title": "一个飞牛APP，把你的小爱音箱变成HomePod",
+    "link": "https://mp.weixin.qq.com/s/Ih-fTerw-ZSr3XGgJE3BlA",
+    "desc": "小爱音箱",
+    "keywords": [
+      "小爱音箱",
+      "homepod"
+    ],
+    "category": "文章"
+  },
+  {
+    "title": "一个飞牛APP，把你的小爱音箱变成HomePod",
+    "link": "https://t.bilibili.com/1257165970165727236?share_source=pc_native",
+    "desc": "",
+    "keywords": [
+      "homepod",
+      "小爱音箱"
+    ],
+    "category": "视频"
   }
 ];
