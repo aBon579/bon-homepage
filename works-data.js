@@ -305,5 +305,15 @@ window.WORKS = [
       "小爱音箱"
     ],
     "category": "视频"
+  },
+  {
+    "title": "飞牛应用不知道哪里找？一个Moo给你聚合上百个应用源。",
+    "link": "https://mp.weixin.qq.com/s/w-S1O97S7xyY6IeJFZi1Mw",
+    "desc": "",
+    "keywords": [
+      "Moo",
+      "第三方应用商店"
+    ],
+    "category": "文章"
   }
 ];
