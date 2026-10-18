@@ -2,59 +2,7 @@
  * works-data.js —— 作品集数据（由 admin.html 导出或手改）
  * title≤30字 | link 链接 | desc 简介 | keywords ≤5 | category: 文章/视频
  * ============================================================ */
-export const WORKS = [
-  {
-    "title": "在家里弄个KTV？跟着我用飞牛NAS搭建你的家庭KTV！",
-    "link": "https://t.bilibili.com/1258629832406728745?share_source=pc_native",
-    "desc": "",
-    "keywords": [
-      "NAS",
-      "KTV",
-      "骏耀"
-    ],
-    "category": "视频"
-  },
-  {
-    "title": "在家也能唱K？一起用飞牛NAS搭建家庭KTV吧！",
-    "link": "https://mp.weixin.qq.com/s/kqNLXC5vkaMdKmhPBGsbvg",
-    "desc": "",
-    "keywords": [
-      "NAS",
-      "KYV",
-      "骏耀"
-    ],
-    "category": "文章"
-  },
-  {
-    "title": "飞牛应用不知道哪里找？一个Moo给你聚合上百个应用源。",
-    "link": "https://mp.weixin.qq.com/s/w-S1O97S7xyY6IeJFZi1Mw",
-    "desc": "",
-    "keywords": [
-      "Moo",
-      "第三方应用商店"
-    ],
-    "category": "文章"
-  },
-  {
-    "title": "一个飞牛APP，把你的小爱音箱变成HomePod",
-    "link": "https://t.bilibili.com/1257165970165727236?share_source=pc_native",
-    "desc": "",
-    "keywords": [
-      "homepod",
-      "小爱音箱"
-    ],
-    "category": "视频"
-  },
-  {
-    "title": "一个飞牛APP，把你的小爱音箱变成HomePod",
-    "link": "https://mp.weixin.qq.com/s/Ih-fTerw-ZSr3XGgJE3BlA",
-    "desc": "",
-    "keywords": [
-      "小爱音箱",
-      "homepod"
-    ],
-    "category": "文章"
-  },
+window.WORKS = [
   {
     "title": "一行命令，启动你的DeepSeek Harness",
     "link": "https://mp.weixin.qq.com/s/6QWz8tCL0quCtSSxZlKHxg",
@@ -335,6 +283,58 @@ export const WORKS = [
     "keywords": [
       "NAS",
       "HomePod"
+    ],
+    "category": "视频"
+  },
+  {
+    "title": "一个飞牛APP，把你的小爱音箱变成HomePod",
+    "link": "https://mp.weixin.qq.com/s/Ih-fTerw-ZSr3XGgJE3BlA",
+    "desc": "小爱音箱",
+    "keywords": [
+      "小爱音箱",
+      "homepod"
+    ],
+    "category": "文章"
+  },
+  {
+    "title": "一个飞牛APP，把你的小爱音箱变成HomePod",
+    "link": "https://t.bilibili.com/1257165970165727236?share_source=pc_native",
+    "desc": "",
+    "keywords": [
+      "homepod",
+      "小爱音箱"
+    ],
+    "category": "视频"
+  },
+  {
+    "title": "飞牛应用不知道哪里找？一个Moo给你聚合上百个应用源。",
+    "link": "https://mp.weixin.qq.com/s/w-S1O97S7xyY6IeJFZi1Mw",
+    "desc": "",
+    "keywords": [
+      "Moo",
+      "第三方应用商店"
+    ],
+    "category": "文章"
+  },
+  {
+    "title": "在家也能唱K？一起用飞牛NAS搭建家庭KTV吧！",
+    "link": "https://mp.weixin.qq.com/s/kqNLXC5vkaMdKmhPBGsbvg",
+    "desc": "",
+    "keywords": [
+      "NAS",
+      "KTV",
+      "骏耀"
+    ],
+    "category": "文章"
+  },
+  {
+    "title": "频 在家里弄个KTV？跟着我用飞牛NAS搭建你的家庭KTV！",
+    "link": "https://t.bilibili.com/1258629832406728745?share_source=pc_native",
+    "desc": "",
+    "keywords": [
+      "NAS",
+      "KTV",
+      "骏耀"
     ],
     "category": "视频"
   }
