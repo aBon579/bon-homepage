@@ -167,30 +167,52 @@
     </footer>
   </main>
 
-  <!-- ============ works: sphere star map + card marquee ============ -->
+  <!-- ============ works: 便当盒最近更新 + 站内搜索 ============ -->
   <section class="works" id="works">
     <header class="section-head r" id="about" style="--d: 0s">
       <span class="eyebrow">WORKS</span>
       <h2>我的作品集</h2>
     </header>
 
-    <div class="sphere-wrap r" style="--d: 0.1s">
-      <canvas id="sphere"></canvas>
+    <!-- 搜索框 -->
+    <div class="search-wrap r" style="--d: 0.1s">
+      <div class="search-box" id="searchBox">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input
+          id="worksSearch"
+          type="text"
+          placeholder="搜索作品：标题 / 关键词 / 分类…"
+          aria-label="搜索作品"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <button id="searchClear" type="button" aria-label="清空搜索">
+          <i class="fa-solid fa-circle-xmark"></i>
+        </button>
+      </div>
+      <p class="search-meta" id="searchMeta"></p>
     </div>
 
-    <!-- 三行卡片由 main.js 从 works-data.js 渲染进 marquee -->
-    <div class="cards-marquee r" id="cardsMarquee" style="--d: 0.2s">
-      <div class="marquee-row" data-dir="-1"><div class="marquee-track"></div></div>
-      <div class="marquee-row stagger" data-dir="1"><div class="marquee-track"></div></div>
+    <!-- 便当盒：最近更新 6 张（搜索时实时替换为结果） -->
+    <div class="bento-wrap r" style="--d: 0.2s">
+      <div class="bento-grid" id="bentoGrid"></div>
+
+      <!-- 空态 -->
+      <div class="bento-empty" id="bentoEmpty" hidden>
+        <i class="fa-regular fa-face-frown-open"></i>
+        <p>没有找到匹配的作品</p>
+        <p class="be-sub">换个关键词试试，或者</p>
+        <button id="emptyReset" type="button">清空搜索</button>
+      </div>
     </div>
   </section>
 
-  <!-- ============ connect: bilibili + wechat ============ -->
+  <!-- ============ connect: bilibili + github + wechat ============ -->
   <section class="connect" id="connect">
     <header class="section-head r" style="--d: 0s">
       <span class="eyebrow">CONNECT</span>
       <h2>来找我玩</h2>
-      <p>折腾的过程都记录在这两个地方，欢迎来关注、来交流。</p>
+      <p>折腾的过程都记录在这些地方，欢迎来关注、来交流。</p>
     </header>
 
     <div class="connect-grid">
@@ -208,17 +230,34 @@
       </a>
 
       <a
-        class="connect-card r wechat"
-        style="--d: 0.16s"
-        href="assets/wechat-qr.jpg"
+        class="connect-card r github"
+        style="--d: 0.14s"
+        href="https://github.com/aBon579"
         target="_blank"
         rel="noopener"
       >
+        <span class="cc-icon"><i class="fa-brands fa-github"></i></span>
+        <h3>GitHub</h3>
+        <p>折腾过的项目与配置，代码都开源在这里。</p>
+        <span class="cc-btn">前往 GitHub<i class="fa-solid fa-arrow-right"></i></span>
+      </a>
+
+      <!-- 公众号：默认收起，点击展开二维码（毛玻璃装裱） -->
+      <div class="connect-card r wechat" id="wechatCard" style="--d: 0.2s">
         <span class="cc-icon"><i class="fa-brands fa-weixin"></i></span>
         <h3>微信公众号</h3>
         <p>长文与教程沉淀在这里，慢慢写、慢慢发。</p>
-        <span class="cc-btn">扫码关注公众号<i class="fa-solid fa-arrow-right"></i></span>
-      </a>
+        <div class="cc-qr" aria-hidden="true">
+          <div class="qr-frame">
+            <img src="assets/wechat-qr.jpg" alt="微信公众号二维码" loading="lazy" />
+          </div>
+          <p class="qr-hint">微信扫码 · 关注公众号</p>
+        </div>
+        <button class="cc-btn cc-toggle" id="qrToggle" type="button" aria-expanded="false">
+          <span class="ct-label-closed">展开二维码<i class="fa-solid fa-chevron-down"></i></span>
+          <span class="ct-label-open">收起二维码<i class="fa-solid fa-chevron-up"></i></span>
+        </button>
+      </div>
     </div>
   </section>
 
