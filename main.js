@@ -223,10 +223,10 @@
   }
 
   /* ============================================================
-     便当盒：最近更新 6 张 + 关键字搜索
-     （替代原星图 + 三行跑马灯）
+     便当盒（最近更新 6 张）+ 搜索结果（普通小卡片）
      ============================================================ */
   const grid = $("#bentoGrid");
+  const results = $("#searchResults");
   const emptyBox = $("#bentoEmpty");
   const searchBox = $("#searchBox");
   const input = $("#worksSearch");
@@ -287,7 +287,8 @@
     return frag;
   }
 
-  function makeCard(w, idx, tokens) {
+  /* ---------- 便当盒卡片（1 大 + 5 小） ---------- */
+  function makeBentoCard(w, idx) {
     const card = document.createElement("a");
     card.className = "bento-card" + (idx === 0 ? " large" : "");
     card.href = w.link || "#";
@@ -309,7 +310,7 @@
     top.append(cat, arrow);
 
     const h3 = document.createElement("h3");
-    h3.appendChild(highlight(w.title, tokens));
+    h3.textContent = w.title;
     card.append(top, h3);
 
     if (w.desc) {
@@ -332,6 +333,54 @@
     const go = document.createElement("span");
     go.className = "bc-go";
     go.textContent = w.category === CAT_VIDEO ? "观看视频" : "阅读原文";
+    card.appendChild(go);
+
+    return card;
+  }
+
+  /* ---------- 搜索结果小卡片（非便当盒） ---------- */
+  function makeSearchCard(w, idx, tokens) {
+    const card = document.createElement("a");
+    card.className = "work-card" + (w.link ? "" : " no-link");
+    card.href = w.link || "#";
+    if (w.link) {
+      card.target = "_blank";
+      card.rel = "noopener";
+    }
+    card.style.setProperty("--i", String(Math.min(idx, 11)));
+
+    const head = document.createElement("div");
+    head.className = "wc-head";
+    const h3 = document.createElement("h3");
+    h3.appendChild(highlight(w.title, tokens));
+    const cat = document.createElement("span");
+    cat.className =
+      "work-cat " + (w.category === CAT_VIDEO ? "cat-video" : "cat-article");
+    cat.innerHTML =
+      '<i class="fa-solid ' + CAT_ICON[w.category] + '"></i>' + w.category;
+    head.append(h3, cat);
+    card.appendChild(head);
+
+    if (w.desc) {
+      const p = document.createElement("p");
+      p.appendChild(highlight(w.desc, tokens));
+      card.appendChild(p);
+    }
+
+    if (w.keywords.length) {
+      const tags = document.createElement("div");
+      tags.className = "work-tags";
+      w.keywords.forEach((k) => {
+        const s = document.createElement("span");
+        s.textContent = k;
+        tags.appendChild(s);
+      });
+      card.appendChild(tags);
+    }
+
+    const go = document.createElement("span");
+    go.className = "wc-go";
+    go.textContent = w.category === CAT_VIDEO ? "观看视频" : "阅读原文";
     const goIcon = document.createElement("i");
     goIcon.className = "fa-solid fa-arrow-right";
     go.appendChild(goIcon);
@@ -340,45 +389,57 @@
     return card;
   }
 
-  function renderBento() {
+  function renderWorks() {
     if (!grid) return;
     const q = input ? input.value : "";
     const tokens = tokensOf(q);
-    const list = tokens.length
-      ? works.filter((w) => matchAll(w, tokens))
-      : works.slice(0, RECENT);
+    const searching = tokens.length > 0;
 
-    grid.innerHTML = "";
-    if (list.length) {
-      list.forEach((w, i) => grid.appendChild(makeCard(w, i, tokens)));
-      grid.style.display = "";
-      if (emptyBox) emptyBox.hidden = true;
-    } else {
+    if (searching) {
+      const list = works.filter((w) => matchAll(w, tokens));
+      grid.innerHTML = "";
       grid.style.display = "none";
-      if (emptyBox) emptyBox.hidden = false;
+      if (results) {
+        results.innerHTML = "";
+        list.forEach((w, i) => results.appendChild(makeSearchCard(w, i, tokens)));
+        results.hidden = list.length === 0;
+      }
+      if (emptyBox) emptyBox.hidden = list.length !== 0;
+      if (metaLine) {
+        metaLine.textContent = list.length
+          ? `找到 ${list.length} 件匹配 · 全部共 ${total} 件作品`
+          : `0 件匹配「${q.trim()}」 · 全部共 ${total} 件作品`;
+      }
+    } else {
+      if (results) {
+        results.innerHTML = "";
+        results.hidden = true;
+      }
+      if (emptyBox) emptyBox.hidden = true;
+      grid.style.display = "";
+      grid.innerHTML = "";
+      works.slice(0, RECENT).forEach((w, i) => grid.appendChild(makeBentoCard(w, i)));
+      if (metaLine) {
+        metaLine.textContent = `最近更新 ${Math.min(RECENT, total)} 件 · 全部共 ${total} 件作品，搜一下更快`;
+      }
     }
 
-    if (searchBox) searchBox.classList.toggle("has-q", q.length > 0);
-    if (metaLine) {
-      metaLine.textContent = tokens.length
-        ? `找到 ${list.length} 件匹配 · 全部共 ${total} 件作品`
-        : `最近更新 ${Math.min(RECENT, total)} 件 · 全部共 ${total} 件作品，搜一下更快`;
-    }
+    if (searchBox) searchBox.classList.toggle("has-q", searching);
   }
 
   if (input) {
-    input.addEventListener("input", renderBento);
+    input.addEventListener("input", renderWorks);
     input.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
         input.value = "";
-        renderBento();
+        renderWorks();
       }
     });
   }
   if (clearBtn) {
     clearBtn.addEventListener("click", () => {
       if (input) input.value = "";
-      renderBento();
+      renderWorks();
       if (input) input.focus();
     });
   }
@@ -386,11 +447,194 @@
   if (emptyReset) {
     emptyReset.addEventListener("click", () => {
       if (input) input.value = "";
-      renderBento();
+      renderWorks();
       if (input) input.focus();
     });
   }
-  renderBento();
+  renderWorks();
+
+  /* ============================================================
+     错位滚动带：全部作品的流动展示（可拖拽 / 悬停暂停 / 点击跳转）
+     ============================================================ */
+  const marquee = $("#cardsMarquee");
+
+  function makeMarqueeCard(w) {
+    const card = document.createElement("article");
+    card.className = "work-card" + (w.link ? "" : " no-link");
+    card.dataset.link = w.link || "";
+
+    const head = document.createElement("div");
+    head.className = "wc-head";
+    const h3 = document.createElement("h3");
+    h3.textContent = w.title;
+    const cat = document.createElement("span");
+    cat.className =
+      "work-cat " + (w.category === CAT_VIDEO ? "cat-video" : "cat-article");
+    cat.innerHTML =
+      '<i class="fa-solid ' + CAT_ICON[w.category] + '"></i>' + w.category;
+    head.append(h3, cat);
+    card.appendChild(head);
+
+    if (w.desc) {
+      const p = document.createElement("p");
+      p.textContent = w.desc;
+      card.appendChild(p);
+    }
+
+    if (w.keywords.length) {
+      const tags = document.createElement("div");
+      tags.className = "work-tags";
+      w.keywords.forEach((k) => {
+        const s = document.createElement("span");
+        s.textContent = k;
+        tags.appendChild(s);
+      });
+      card.appendChild(tags);
+    }
+
+    const go = document.createElement("span");
+    go.className = "wc-go";
+    go.textContent = w.link ? (w.category === CAT_VIDEO ? "观看视频" : "阅读原文") : "链接待填";
+    if (w.link) {
+      const goIcon = document.createElement("i");
+      goIcon.className = "fa-solid fa-arrow-right";
+      go.appendChild(goIcon);
+    }
+    card.appendChild(go);
+    return card;
+  }
+
+  if (marquee) {
+    const rows = $$(".marquee-row", marquee);
+
+    if (!works.length) {
+      const empty = document.createElement("div");
+      empty.className = "work-card no-link";
+      empty.style.margin = "0 auto";
+      empty.innerHTML = "<h3>作品集准备中</h3><p>先去公众号逛逛？</p>";
+      marquee.innerHTML = "";
+      marquee.appendChild(empty);
+    } else {
+      const rowItems = rows.map(() => []);
+      works.forEach((w, i) => rowItems[i % rows.length].push(w));
+
+      const rowStates = [];
+      rows.forEach((row, r) => {
+        const track = $(".marquee-track", row);
+        const items = rowItems[r];
+        if (!items.length) {
+          row.style.display = "none";
+          rowStates.push(null);
+          return;
+        }
+        items.forEach((w) => track.appendChild(makeMarqueeCard(w)));
+        // 复制一份实现无缝循环
+        const clones = Array.from(track.children).map((c) => {
+          const cl = c.cloneNode(true);
+          cl.dataset.clone = "1";
+          return cl;
+        });
+        clones.forEach((cl) => track.appendChild(cl));
+
+        rowStates.push({
+          row,
+          track,
+          pos: -Math.random() * 160,
+          dir: Number(row.dataset.dir) || -1,
+          speed: 38,
+          vel: 0,
+          dragging: false,
+          hover: false,
+          half: 0,
+          lastX: 0,
+          lastT: 0,
+        });
+      });
+
+      function measure() {
+        rowStates.forEach((st) => {
+          if (st) st.half = st.track.scrollWidth / 2;
+        });
+      }
+      measure();
+      window.addEventListener("resize", measure);
+      if ("ResizeObserver" in window) {
+        const mro = new ResizeObserver(measure);
+        rowStates.forEach((st) => st && mro.observe(st.track));
+      }
+
+      // 拖拽 / 悬停暂停 / 点击跳转
+      rowStates.forEach((st) => {
+        if (!st) return;
+        const { track } = st;
+
+        track.addEventListener("pointerdown", (e) => {
+          st.dragging = true;
+          st.moved = 0;
+          st.lastX = e.clientX;
+          st.lastT = performance.now();
+          st.vel = 0;
+          track.classList.add("dragging");
+          track.setPointerCapture(e.pointerId);
+        });
+        track.addEventListener("pointermove", (e) => {
+          if (!st.dragging) return;
+          const now = performance.now();
+          const dx = e.clientX - st.lastX;
+          const dt = Math.max((now - st.lastT) / 1000, 0.008);
+          st.moved += Math.abs(dx);
+          st.pos += dx;
+          st.vel = (dx / dt) * 0.35;
+          st.lastX = e.clientX;
+          st.lastT = now;
+        });
+        const end = (e) => {
+          if (!st.dragging) return;
+          st.dragging = false;
+          track.classList.remove("dragging");
+          try { track.releasePointerCapture(e.pointerId); } catch (_) {}
+          if (reduced) st.vel = 0;
+        };
+        track.addEventListener("pointerup", end);
+        track.addEventListener("pointercancel", end);
+
+        st.row.addEventListener("pointerenter", () => { st.hover = true; });
+        st.row.addEventListener("pointerleave", () => { st.hover = false; });
+
+        // 点击卡片 → 打开对应链接
+        track.addEventListener("click", (e) => {
+          // setPointerCapture 会把 click 的 target 改写成 track，
+          // 用坐标反查真实卡片
+          const hit = document.elementFromPoint(e.clientX, e.clientY);
+          const card = hit && hit.closest(".work-card");
+          if (!card || st.moved > 6) return;
+          const link = card.dataset.link;
+          if (link) window.open(link, "_blank", "noopener");
+        });
+      });
+
+      // 单一 rAF 驱动两行
+      let mLast = 0;
+      function mFrame(now) {
+        const dt = mLast ? Math.min((now - mLast) / 1000, 0.05) : 0.016;
+        mLast = now;
+        rowStates.forEach((st) => {
+          if (!st || !st.half) return;
+          if (!st.dragging) {
+            if (!reduced && !st.hover) st.pos += st.dir * st.speed * dt;
+            st.pos += st.vel * dt;
+            st.vel *= Math.exp(-(st.hover ? 6 : 2.2) * dt);
+          }
+          // 环形回绕
+          while (st.pos <= -st.half) st.pos += st.half;
+          while (st.pos > 0) st.pos -= st.half;
+          st.track.style.transform = "translate3d(" + st.pos + "px,0,0)";
+        });
+        requestAnimationFrame(mFrame);
+      }
+      requestAnimationFrame(mFrame);
+    }
+  }
 
   /* ============================================================
      公众号卡片：二维码收起 / 展开（圆角毛玻璃装裱）

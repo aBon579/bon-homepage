@@ -907,7 +907,7 @@ html {
   color: var(--blue-soft);
 }
 
-/* 空态 */
+/* 空态（hidden 属性必须能生效） */
 .bento-empty {
   display: flex;
   flex-direction: column;
@@ -918,6 +918,10 @@ html {
   border: 1px dashed rgba(255, 255, 255, 0.16);
   background: rgba(255, 255, 255, 0.04);
   text-align: center;
+}
+
+.bento-empty[hidden] {
+  display: none;
 }
 
 .bento-empty > i {
@@ -951,6 +955,142 @@ html {
 .bento-empty button:hover {
   background: #323234;
   color: #fff;
+}
+
+/* ============================================================
+   搜索结果：普通小卡片网格（非便当盒）
+   ============================================================ */
+.search-results {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: clamp(12px, 1.6vw, 18px);
+}
+
+.search-results .work-card {
+  width: auto;
+  animation: bentoIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--i, 0) * 40ms);
+}
+
+/* ============================================================
+   错位滚动带：全部作品的流动展示
+   ============================================================ */
+.cards-marquee {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 2vh, 18px);
+  margin-top: clamp(26px, 4vh, 44px);
+}
+
+.marquee-row {
+  overflow: hidden;
+}
+
+.marquee-track {
+  display: flex;
+  gap: 16px;
+  width: max-content;
+  will-change: transform;
+  cursor: grab;
+  touch-action: pan-y;
+}
+
+.marquee-track.dragging {
+  cursor: grabbing;
+}
+
+/* 第二行整体偏移，制造交错感 */
+.marquee-row.stagger .marquee-track {
+  padding-left: 90px;
+}
+
+.work-card {
+  flex: 0 0 auto;
+  width: clamp(240px, 26vw, 300px);
+  padding: 16px 18px;
+  border-radius: 20px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.work-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 255, 255, 0.24);
+}
+
+.work-card.no-link {
+  cursor: default;
+}
+
+.work-card.no-link:hover {
+  transform: none;
+}
+
+.work-card.no-link .wc-go {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.wc-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.work-card h3 {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+}
+
+.work-card h3 mark {
+  background: rgba(122, 143, 255, 0.35);
+  color: #fff;
+  border-radius: 3px;
+  padding: 0 2px;
+}
+
+.work-card p {
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.55;
+}
+
+.work-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.work-tags span {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.68);
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 999px;
+  padding: 3px 10px;
+  line-height: 1.4;
+}
+
+.wc-go {
+  margin-top: auto;
+  font-size: 12px;
+  color: var(--blue-soft);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 /* ============================================================
@@ -1092,10 +1232,17 @@ html {
 }
 
 /* ============================================================
-   公众号：二维码收起 / 展开（圆角毛玻璃装裱）
+   公众号：二维码向上浮层展开（不撑开卡片、不影响邻卡布局）
    ============================================================ */
 .connect-card.wechat {
+  /* 允许浮层越出卡片边界 */
+  overflow: visible;
   cursor: default;
+}
+
+.connect-card.wechat::before {
+  /* overflow 改 visible 后需自带圆角裁剪光晕 */
+  border-radius: inherit;
 }
 
 .connect-card.wechat:hover {
@@ -1103,28 +1250,36 @@ html {
 }
 
 .cc-qr {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  max-height: 0;
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% - 16px);
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   opacity: 0;
-  overflow: hidden;
-  transform: translateY(8px);
+  visibility: hidden;
+  transform: translate(-50%, 10px);
+  pointer-events: none;
   transition:
-    max-height 0.45s cubic-bezier(0.22, 1, 0.36, 1),
     opacity 0.35s ease,
-    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s linear 0.45s;
 }
 
 .connect-card.open .cc-qr {
-  max-height: 320px;
   opacity: 1;
-  transform: translateY(0);
+  visibility: visible;
+  transform: translate(-50%, 0);
+  pointer-events: none; /* 二维码仅供扫码，避免浮层挡住邻卡点击 */
+  transition:
+    opacity 0.35s ease 0.05s,
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.05s,
+    visibility 0s;
 }
 
 /* 毛玻璃画框 */
 .qr-frame {
-  width: fit-content;
   padding: 10px;
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.12);
@@ -1146,9 +1301,15 @@ html {
 
 .qr-hint {
   margin-top: 10px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.85);
   letter-spacing: 0.02em;
+  white-space: nowrap;
 }
 
 /* 展开 / 收起按钮 */
@@ -1235,6 +1396,10 @@ html {
   .bento-card.large {
     grid-column: span 2;
     grid-row: span 1;
+  }
+
+  .marquee-row.stagger .marquee-track {
+    padding-left: 48px;
   }
 
   .connect-grid {

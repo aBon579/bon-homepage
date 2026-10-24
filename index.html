@@ -193,17 +193,26 @@
       <p class="search-meta" id="searchMeta"></p>
     </div>
 
-    <!-- 便当盒：最近更新 6 张（搜索时实时替换为结果） -->
+    <!-- 便当盒：最近更新 6 张（搜索时替换为普通卡片结果网格） -->
     <div class="bento-wrap r" style="--d: 0.2s">
       <div class="bento-grid" id="bentoGrid"></div>
 
-      <!-- 空态 -->
+      <!-- 搜索结果：普通小卡片（非便当盒） -->
+      <div class="search-results" id="searchResults" hidden></div>
+
+      <!-- 空态（仅在搜索后无匹配时显示） -->
       <div class="bento-empty" id="bentoEmpty" hidden>
         <i class="fa-regular fa-face-frown-open"></i>
         <p>没有找到匹配的作品</p>
         <p class="be-sub">换个关键词试试，或者</p>
         <button id="emptyReset" type="button">清空搜索</button>
       </div>
+    </div>
+
+    <!-- 错位滚动带：全部作品的流动展示（由 main.js 渲染） -->
+    <div class="cards-marquee r" id="cardsMarquee" style="--d: 0.3s">
+      <div class="marquee-row" data-dir="-1"><div class="marquee-track"></div></div>
+      <div class="marquee-row stagger" data-dir="1"><div class="marquee-track"></div></div>
     </div>
   </section>
 
