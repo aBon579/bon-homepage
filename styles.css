@@ -1258,8 +1258,8 @@ html {
   transform: none;
 }
 
-/* 浮层 = 卡片内一块圆角毛玻璃面板：只盖中部信息区，
-   四周内缩 12px 不与卡片边缘重合，底部收起按钮始终可见可点 */
+/* 浮层 = 卡片内一块圆角毛玻璃面板：左二维码 + 右两行提示，
+   四周内缩不与卡片边缘重合，底部收起按钮始终可见可点 */
 .cc-qr {
   position: absolute;
   top: 10px;
@@ -1267,11 +1267,11 @@ html {
   right: 12px;
   z-index: 30;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 12px;
+  gap: 14px;
+  padding: 12px 16px;
   border-radius: 16px;
   background: rgba(4, 10, 8, 0.72);
   backdrop-filter: blur(14px);
@@ -1320,19 +1320,20 @@ html {
   background: #fff;
 }
 
-/* 提示文字：两行居中、高亮度 */
+/* 提示文字：二维码右侧、两行左对齐、高亮度 */
 .qr-hint {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 2px;
+  align-items: flex-start;
+  gap: 3px;
   margin: 0;
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 500;
   line-height: 1.5;
   color: rgba(255, 255, 255, 0.95);
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
+  text-align: left;
 }
 
 /* 展开 / 收起按钮 */
