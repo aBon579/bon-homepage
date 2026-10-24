@@ -437,10 +437,17 @@
     });
   }
   if (clearBtn) {
-    clearBtn.addEventListener("click", () => {
+    clearBtn.addEventListener("click", (e) => {
+      e.preventDefault();
       if (input) input.value = "";
       renderWorks();
       if (input) input.focus();
+    });
+    // 指针按下即清空，避免点击偏移导致“点了没反应”
+    clearBtn.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      if (input) input.value = "";
+      renderWorks();
     });
   }
   const emptyReset = $("#emptyReset");
@@ -646,5 +653,14 @@
       const open = wechatCard.classList.toggle("open");
       qrToggle.setAttribute("aria-expanded", open ? "true" : "false");
     });
+    // 展开的遮罩浮层：点击任意空白处即可收起（二维码图片除外）
+    const qrPanel = $(".cc-qr", wechatCard);
+    if (qrPanel) {
+      qrPanel.addEventListener("click", (e) => {
+        if (e.target.closest(".qr-frame")) return; // 点在二维码上不收起
+        wechatCard.classList.remove("open");
+        qrToggle.setAttribute("aria-expanded", "false");
+      });
+    }
   }
 })();

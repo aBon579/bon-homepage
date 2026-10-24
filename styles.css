@@ -700,21 +700,26 @@ html {
 .search-box button {
   flex: 0 0 auto;
   display: none;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  margin: 2px;
   border: 0;
+  border-radius: 999px;
   background: transparent;
-  color: rgba(255, 255, 255, 0.45);
-  font-size: 15px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 17px;
   cursor: pointer;
-  padding: 4px;
-  border-radius: 50%;
-  transition: color 0.2s ease;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 .search-box.has-q button {
-  display: inline-block;
+  display: inline-flex;
 }
 
 .search-box button:hover {
+  background: rgba(255, 255, 255, 0.14);
   color: #fff;
 }
 
@@ -1136,7 +1141,7 @@ html {
 }
 
 .connect-card.github::before {
-  background: radial-gradient(90% 120% at 85% 0%, rgba(163, 113, 247, 0.22), transparent 60%);
+  background: radial-gradient(90% 120% at 85% 0%, rgba(139, 148, 158, 0.25), transparent 60%);
 }
 
 .connect-card.wechat::before {
@@ -1153,7 +1158,7 @@ html {
 }
 
 .connect-card.github:hover {
-  box-shadow: 0 18px 50px rgba(163, 113, 247, 0.2);
+  box-shadow: 0 18px 50px rgba(245, 246, 250, 0.22);
 }
 
 .connect-card.wechat:hover {
@@ -1182,8 +1187,16 @@ html {
 }
 
 .connect-card.github .cc-icon {
-  background: linear-gradient(135deg, #a371f7, #6e40c9);
-  box-shadow: 0 8px 22px rgba(163, 113, 247, 0.32);
+  /* 白底黑图标（GitHub 反色搭配） */
+  background: linear-gradient(135deg, #f5f7fa, #e4e8ec);
+  color: #0d1117;
+  box-shadow:
+    0 8px 22px rgba(255, 255, 255, 0.2),
+    inset 0 0 0 1.5px rgba(0, 0, 0, 0.35);
+}
+
+.connect-card.github .cc-icon i {
+  color: #0d1117;
 }
 
 .connect-card.wechat .cc-icon {
@@ -1232,34 +1245,33 @@ html {
 }
 
 /* ============================================================
-   公众号：二维码向上浮层展开（不撑开卡片、不影响邻卡布局）
+   公众号：二维码在卡片范围内浮层展开（全覆盖遮罩，不撑尺寸）
    ============================================================ */
 .connect-card.wechat {
-  /* 允许浮层越出卡片边界 */
-  overflow: visible;
   cursor: default;
-}
-
-.connect-card.wechat::before {
-  /* overflow 改 visible 后需自带圆角裁剪光晕 */
-  border-radius: inherit;
 }
 
 .connect-card.wechat:hover {
   transform: none;
 }
 
+/* 浮层 = 卡片内全覆盖遮罩：盖住卡内图标/文字，居中展示二维码 */
 .cc-qr {
   position: absolute;
-  left: 50%;
-  bottom: calc(100% - 16px);
+  inset: 0;
   z-index: 30;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border-radius: 24px;
+  background: rgba(4, 10, 8, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   opacity: 0;
   visibility: hidden;
-  transform: translate(-50%, 10px);
+  transform: translateY(14px);
   pointer-events: none;
   transition:
     opacity 0.35s ease,
@@ -1270,8 +1282,8 @@ html {
 .connect-card.open .cc-qr {
   opacity: 1;
   visibility: visible;
-  transform: translate(-50%, 0);
-  pointer-events: none; /* 二维码仅供扫码，避免浮层挡住邻卡点击 */
+  transform: translateY(0);
+  pointer-events: auto;
   transition:
     opacity 0.35s ease 0.05s,
     transform 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.05s,
@@ -1300,12 +1312,10 @@ html {
 }
 
 .qr-hint {
-  margin-top: 10px;
   padding: 4px 12px;
   border-radius: 999px;
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   font-size: 12px;
   color: rgba(255, 255, 255, 0.85);
   letter-spacing: 0.02em;
