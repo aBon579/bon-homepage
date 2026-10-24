@@ -1262,14 +1262,16 @@ html {
    四周内缩 12px 不与卡片边缘重合，底部收起按钮始终可见可点 */
 .cc-qr {
   position: absolute;
-  top: 12px;
+  top: 10px;
   left: 12px;
   right: 12px;
   z-index: 30;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 14px;
+  gap: 8px;
+  padding: 12px;
   border-radius: 16px;
   background: rgba(4, 10, 8, 0.72);
   backdrop-filter: blur(14px);
@@ -1312,10 +1314,25 @@ html {
 .qr-frame img {
   display: block;
   /* 尺寸收敛：面板整体变矮，收起按钮不被遮挡 */
-  width: clamp(112px, 13vw, 138px);
+  width: clamp(108px, 12vw, 130px);
   height: auto;
   border-radius: 8px;
   background: #fff;
+}
+
+/* 提示文字：两行居中、高亮度 */
+.qr-hint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.95);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
+  letter-spacing: 0.03em;
 }
 
 /* 展开 / 收起按钮 */
