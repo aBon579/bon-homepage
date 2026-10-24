@@ -135,13 +135,22 @@
       title: String(w.title || "").trim().slice(0, 30),
       link: String(w.link || "").trim(),
       desc: String(w.desc || "").trim(),
+      date: String(w.date || "").trim().slice(0, 10),
       keywords: (Array.isArray(w.keywords) ? w.keywords : [])
         .map((k) => String(k).trim())
         .filter(Boolean)
         .slice(0, 5),
       category: w.category === CAT_VIDEO ? CAT_VIDEO : CAT_ARTICLE,
     }))
-    .filter((w) => w.title);
+    .filter((w) => w.title)
+    // 显式按发布日期倒序（无 date 的排最后）——
+    // “最近更新”依赖此排序，不再信任文件顺序
+    .sort((a, b) => {
+      if (a.date === b.date) return 0;
+      if (!a.date) return 1;
+      if (!b.date) return -1;
+      return b.date.localeCompare(a.date);
+    });
 
   /* ---------------- 实时统计 ---------------- */
   const total = works.length;
