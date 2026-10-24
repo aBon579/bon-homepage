@@ -21,6 +21,18 @@ if (-not (Test-Path ".git")) {
     exit 1
 }
 
+# ---- cache busting：给静态资源引用加时间戳版本号，强制浏览器刷新缓存 ----
+$v = Get-Date -Format 'yyyyMMddHHmm'
+$ix = Join-Path $PSScriptRoot "index.html"
+if (Test-Path $ix) {
+    $c = [System.IO.File]::ReadAllText($ix, [System.Text.Encoding]::UTF8)
+    $c2 = $c -replace '\?v=[A-Za-z0-9]+', "?v=$v"
+    if ($c2 -ne $c) {
+        [System.IO.File]::WriteAllText($ix, $c2, (New-Object System.Text.UTF8Encoding($false)))
+        Write-Host "[OK] 资源版本号已更新: ?v=$v"
+    }
+}
+
 git add -A
 $staged = git status --porcelain
 

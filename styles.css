@@ -1320,8 +1320,9 @@ html {
   background: #fff;
 }
 
-/* 提示文字：二维码右侧、两行左对齐、高亮度 */
-.qr-hint {
+/* 提示文字：二维码右侧、两行左对齐、高亮度
+   （.cc-qr 前缀提高特异性，避免被 .connect-card p 的低亮度样式覆盖） */
+.cc-qr .qr-hint {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
