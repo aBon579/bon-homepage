@@ -1225,7 +1225,8 @@ html {
 .cc-btn {
   position: relative;
   z-index: 1;
-  margin-top: 10px;
+  /* 沉底：把按钮推到卡片底部，与描述之间的空隙留在中部 */
+  margin-top: auto;
   display: inline-flex;
   align-items: center;
   gap: 8px;
